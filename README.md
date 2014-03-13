@@ -1,9 +1,9 @@
 # Project Euler in Rust
 
-# Problems Finished:
+## Problems Finished:
 1  - 10 ... in progress
 
-# Running
+## Running
 To run tests:
 * Make a "tests" directory: `mkdir -p tests`
 * Compile using rusts builtin support for tests: `rustc --test --out-dir probNUM.rs`
