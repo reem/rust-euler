@@ -60,13 +60,13 @@ impl Iterator<u64> for Fibonacci {
     }
 }
 
+fn fibonacci_smart(value_cap: u64) -> ~[u64] {
+    Fibonacci::new().take_while(|&num| num < value_cap).collect()
+}
+
 fn main() {
     println!("{}", prob2_simple(4e6 as u64));
     println!("{}", prob2_smart(4e6 as u64));
-}
-
-fn fibonacci_smart(value_cap: u64) -> ~[u64] {
-    Fibonacci::new().take_while(|&num| num < value_cap).collect()
 }
 
 #[cfg(test)]
