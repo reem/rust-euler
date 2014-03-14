@@ -1,4 +1,9 @@
+extern mod extra;
+
 use std::iter::AdditiveIterator;
+
+#[cfg(test)]
+use extra::test;
 
 fn prob2_simple(value_cap: u64) -> u64 {
     let mut result = 0;
@@ -33,10 +38,10 @@ fn fibonacci_simple(num_terms: u64) -> ~[u64] {
 fn prob2_smart(value_cap: u64) -> u64 {
     // Here we can be clever and generate only the values we need because
     // we have a custom Iterator.
-    let f = fibonacci_smart(value_cap);
-    f.iter()
+    Fibonacci::new()
+        .take_while(|&num| num < value_cap)
         .filter(|&num| num % 2 == 0)
-        .map(|&u| u)
+        .map(|u| u)
         .sum()
 }
 
@@ -60,8 +65,9 @@ impl Iterator<u64> for Fibonacci {
     }
 }
 
-fn fibonacci_smart(value_cap: u64) -> ~[u64] {
-    Fibonacci::new().take_while(|&num| num < value_cap).collect()
+#[cfg(test)]
+fn fibonacci_smart(num_terms: u64) -> ~[u64] {
+    Fibonacci::new().take(num_terms as uint).collect()
 }
 
 fn main() {
@@ -119,8 +125,20 @@ fn test_fibonacci_simple() {
 
 #[test]
 fn test_fibonacci_smart() {
-    assert!(fibonacci_smart(0).len() == 0);
-    assert!(fibonacci_smart(2) == ~[1u64]);
-    assert!(fibonacci_smart(3) == ~[1, 2]);
-    assert!(fibonacci_smart(10) == ~[1, 2, 3, 5, 8u64]);
+    check_fibonacci_impl(fibonacci_smart);
+}
+
+#[cfg(test)]
+fn bench_fibonacci(fibonacci_impl : fn(u64) -> ~[u64]) {
+    fibonacci_impl(1000);
+}
+
+#[bench]
+fn bench_fibonacci_smart(b: &mut test::BenchHarness) {
+    b.iter(|| bench_fibonacci(fibonacci_smart))
+}
+
+#[bench]
+fn bench_fibonacci_simple(b: &mut test::BenchHarness) {
+    b.iter(|| bench_fibonacci(fibonacci_simple))
 }
