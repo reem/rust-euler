@@ -1,5 +1,10 @@
+extern mod extra;
+
 use std::iter;
 use std::f64;
+
+#[cfg(test)]
+use extra::test;
 
 type prob3_implT       = fn(u64) -> Option<u64>;
 type prime_factorizerT = fn(u64) -> Option<~[u64]>;
@@ -132,4 +137,14 @@ fn test_prime_factorizer() {
 #[test]
 fn test_prob3() {
     check_prob3_impl(prob3);
+}
+
+#[bench]
+fn bench_prime_generator(b: &mut test::BenchHarness) {
+    b.iter(|| { let _ = first_n_primes(10000); });
+}
+
+#[bench]
+fn bench_prob3(b: &mut test::BenchHarness) {
+    b.iter(|| { let _ = prob3(2345678908); }); // Secure random number ;)
 }
