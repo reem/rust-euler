@@ -1,5 +1,9 @@
+extern mod extra;
+
 use std::iter::Iterator;
 use std::iter::AdditiveIterator;
+
+use extra::test;
 
 fn simple_prob1(limit: int) -> int {
     // An imperative implementation.
@@ -50,4 +54,19 @@ fn test_simple_prob1() {
 #[test]
 fn test_higher_order_prob1() {
     check_prob1(higher_order_prob1);
+}
+
+#[cfg(test)]
+fn bench_prob1_impl(prob1_impl : fn(int) -> int) {
+    prob1_impl(100000);
+}
+
+#[bench]
+fn bench_prob1_smart(b: &mut test::BenchHarness) {
+    b.iter(|| bench_prob1_impl(higher_order_prob1));
+}
+
+#[bench]
+fn bench_prob1_simple(b: &mut test::BenchHarness) {
+    b.iter(|| bench_prob1_impl(simple_prob1));
 }
