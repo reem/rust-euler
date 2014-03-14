@@ -7,9 +7,11 @@ use extra::test;
 
 fn prob2_simple(value_cap: u64) -> u64 {
     let mut result = 0;
-    // We have to arbitrarily pick a very high number
-    // but not too high because this is not lazy.
-    let fibs = fibonacci_simple(1e6 as u64);
+    // We have to arbitrarily pick a high number
+    // but not too high because this is not lazy
+    // and we know that the fibonacci sequence grows
+    // exponentially.
+    let fibs = fibonacci_simple(100 as u64);
     for num in fibs.iter() {
         if *num > value_cap {
             break;
@@ -41,7 +43,6 @@ fn prob2_smart(value_cap: u64) -> u64 {
     Fibonacci::new()
         .take_while(|&num| num < value_cap)
         .filter(|&num| num % 2 == 0)
-        .map(|u| u)
         .sum()
 }
 
@@ -141,4 +142,19 @@ fn bench_fibonacci_smart(b: &mut test::BenchHarness) {
 #[bench]
 fn bench_fibonacci_simple(b: &mut test::BenchHarness) {
     b.iter(|| bench_fibonacci(fibonacci_simple))
+}
+
+#[cfg(test)]
+fn bench_prob2_impl(prob2_impl: fn(u64) -> u64) {
+    prob2_impl(1e18 as u64);
+}
+
+#[bench]
+fn bench_prob2_smart(b: &mut test::BenchHarness) {
+    b.iter(|| bench_prob2_impl(prob2_smart))
+}
+
+#[bench]
+fn bench_prob2_simple(b: &mut test::BenchHarness) {
+    b.iter(|| bench_prob2_impl(prob2_simple))
 }
