@@ -3,6 +3,7 @@ extern mod extra;
 use std::iter::Iterator;
 use std::iter::AdditiveIterator;
 
+#[cfg(test)]
 use extra::test;
 
 fn simple_prob1(limit: int) -> int {
