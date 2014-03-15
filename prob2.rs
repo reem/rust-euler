@@ -1,43 +1,10 @@
-extern mod extra;
+#[allow(deprecated_owned_vector)]; // for test crate
+extern crate test;
 
 use std::iter::AdditiveIterator;
+use std::vec_ng::Vec;
 
-#[cfg(test)]
-use extra::test;
-
-fn prob2_simple(value_cap: u64) -> u64 {
-    let mut result = 0;
-    // We have to arbitrarily pick a high number
-    // but not too high because this is not lazy
-    // and we know that the fibonacci sequence grows
-    // exponentially.
-    let fibs = fibonacci_simple(100 as u64);
-    for num in fibs.iter() {
-        if *num > value_cap {
-            break;
-        }
-        if *num % 2 == 0 {
-            result += *num;
-        }
-    }
-    result
-}
-
-fn fibonacci_simple(num_terms: u64) -> ~[u64] {
-    return match num_terms {
-        0 => ~[],
-        1 => ~[1],
-        2 => ~[1, 2],
-        _ => { let mut fib = ~[1, 2];
-               for i in range(0, num_terms - 2) {
-                   fib.push(fib[i+1] + fib[i]);
-               }
-               fib
-              }
-    }
-}
-
-fn prob2_smart(value_cap: u64) -> u64 {
+fn prob2(value_cap: u64) -> u64 {
     // Here we can be clever and generate only the values we need because
     // we have a custom Iterator.
     Fibonacci::new()
@@ -47,8 +14,8 @@ fn prob2_smart(value_cap: u64) -> u64 {
 }
 
 struct Fibonacci {
-    priv current: u64,
-    priv last: u64,
+    current: u64,
+    last: u64,
 }
 
 impl Fibonacci {
@@ -67,13 +34,13 @@ impl Iterator<u64> for Fibonacci {
 }
 
 #[cfg(test)]
-fn fibonacci_smart(num_terms: u64) -> ~[u64] {
+fn fibonacci(num_terms: u64) -> Vec<u64> {
     Fibonacci::new().take(num_terms as uint).collect()
 }
 
+#[cfg(not(test))]
 fn main() {
-    println!("{}", prob2_simple(4e6 as u64));
-    println!("{}", prob2_smart(4e6 as u64));
+    println!("{}", prob2(4e6 as u64));
 }
 
 #[cfg(test)]
@@ -94,54 +61,39 @@ fn check_prob2_zero(prob2_impl : fn(u64) -> u64) {
 }
 
 #[test]
-fn test_prob2_simple() {
-    check_prob2_impl(prob2_simple);
-}
-
-#[test]
-fn test_prob2_smart() {
-    check_prob2_impl(prob2_smart);
+fn test_prob2() {
+    check_prob2_impl(prob2);
 }
 
 #[cfg(test)]
-fn check_fibonacci_impl(fibonacci_impl : fn (u64) -> ~[u64]) {
+fn check_fibonacci_impl(fibonacci_impl : fn (u64) -> Vec<u64>) {
     check_fibonacci_empty(fibonacci_impl);
     check_fibonacci_regular(fibonacci_impl);
 }
 
 #[cfg(test)]
-fn check_fibonacci_regular(fibonacci_impl : fn (u64) -> ~[u64]) {
-    assert!(fibonacci_impl(10) == ~[1, 2, 3, 5, 8, 13, 21, 34, 55, 89]);
+fn check_fibonacci_regular(fibonacci_impl : fn (u64) -> Vec<u64>) {
+    assert!(fibonacci_impl(10) == vec!(1, 2, 3, 5, 8, 13, 21, 34, 55, 89));
 }
 
 #[cfg(test)]
-fn check_fibonacci_empty(fibonacci_impl : fn (u64) -> ~[u64]) {
+fn check_fibonacci_empty(fibonacci_impl : fn (u64) -> Vec<u64>) {
     assert!(fibonacci_impl(0).len() == 0);
 }
 
 #[test]
-fn test_fibonacci_simple() {
-    check_fibonacci_impl(fibonacci_simple);
-}
-
-#[test]
-fn test_fibonacci_smart() {
-    check_fibonacci_impl(fibonacci_smart);
+fn test_fibonacci() {
+    check_fibonacci_impl(fibonacci);
 }
 
 #[cfg(test)]
-fn bench_fibonacci(fibonacci_impl : fn(u64) -> ~[u64]) {
+fn bench_fibonacci_impl(fibonacci_impl : fn(u64) -> Vec<u64>) {
     fibonacci_impl(1000);
 }
 
 #[bench]
-fn bench_fibonacci_smart(b: &mut test::BenchHarness) {
-    b.iter(|| bench_fibonacci(fibonacci_smart))
-}
-
-#[bench]
-fn bench_fibonacci_simple(b: &mut test::BenchHarness) {
-    b.iter(|| bench_fibonacci(fibonacci_simple))
+fn bench_fibonacci(b: &mut test::BenchHarness) {
+    b.iter(|| bench_fibonacci_impl(fibonacci))
 }
 
 #[cfg(test)]
@@ -150,11 +102,6 @@ fn bench_prob2_impl(prob2_impl: fn(u64) -> u64) {
 }
 
 #[bench]
-fn bench_prob2_smart(b: &mut test::BenchHarness) {
-    b.iter(|| bench_prob2_impl(prob2_smart))
-}
-
-#[bench]
-fn bench_prob2_simple(b: &mut test::BenchHarness) {
-    b.iter(|| bench_prob2_impl(prob2_simple))
+fn bench_prob2(b: &mut test::BenchHarness) {
+    b.iter(|| bench_prob2_impl(prob2))
 }
