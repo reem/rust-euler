@@ -1,10 +1,8 @@
-extern mod extra;
+#[allow(deprecated_owned_vector)]; // For now, until the test crate is fixed.
+extern crate test;
 
 use std::iter::Iterator;
 use std::iter::AdditiveIterator;
-
-#[cfg(test)]
-use extra::test;
 
 fn simple_prob1(limit: int) -> int {
     // An imperative implementation.
@@ -24,6 +22,7 @@ fn higher_order_prob1(limit: int) -> int {
         .sum()
 }
 
+#[cfg(not(test))]
 fn main() {
     println!("{}", simple_prob1(1000));
     println!("{}", higher_order_prob1(1000));
