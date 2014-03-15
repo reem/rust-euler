@@ -1,8 +1,7 @@
-extern mod extra;
+#[allow(deprecated_owned_vector)];
+extern crate test;
 
-#[cfg(test)]
-use extra::test;
-
+#[cfg(not(test))]
 fn main() {
     println!("{}", prob4(100, 999));
 }
